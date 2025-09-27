@@ -15,7 +15,13 @@ class OrderStatus(models.TextChoices):
 
 class Category(models.Model):
     name = models.CharField(max_length=155, null=False, blank=False, unique=True)
-    slug = models.SlugField(unique=True, max_length=155, blank=True, db_index=True)
+    slug = models.SlugField(
+        unique=True,
+        max_length=155,
+        blank=True,
+        db_index=True,
+        help_text="A URL-Friendly version of the category name. Auto-generated if not provided.",
+    )
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -38,8 +44,14 @@ class Product(models.Model):
     category = models.ForeignKey(
         Category, on_delete=models.PROTECT, related_name="products", db_index=True
     )
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    stock = models.PositiveIntegerField(default=0)
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        help_text="Price of the product in your store's currency.",
+    )
+    stock = models.PositiveIntegerField(
+        default=0, help_text="The number of units available in stock."
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

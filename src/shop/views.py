@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAdminUser, IsAuthenticatedOrReadOnly
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from .serializers import (
     ProductListSerializer,
     ProductDetailSerializer,
@@ -12,7 +13,14 @@ from .filters import ProductFilter
 
 # Create your views here.
 
-
+@extend_schema_view(
+    list=extend_schema(description="Get a paginated list of all products. Can be filtered by category slug."),
+    retrieve=extend_schema(description="Get details of a single product by it's ID."),
+    create=extend_schema(description="[Admin Only] Create a new product."),
+    update=extend_schema(description="[Admin Only] Fully update a product's details."),
+    partial_update=extend_schema(description="[Admin Only] Partially update a product's details."),
+    destroy=extend_schema(description="[Admin Only] Delete a product from the catalog."),
+)
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all().select_related("category")
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
@@ -41,6 +49,14 @@ class ProductViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
 
+@extend_schema_view(
+    list=extend_schema(description="Get a list of all categories."),
+    retrieve=extend_schema(description="Get details of a single category by it's ID."),
+    create=extend_schema(description="[Admin Only] Create a new category."),
+    update=extend_schema(description="[Admin Only] Fully update a category's details."),
+    partial_update=extend_schema(description="[Admin Only] Partially update a category's details."),
+    destroy=extend_schema(description="[Admin Only] Delete a category from the catalog."),
+)
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     queryset = Category.objects.all()

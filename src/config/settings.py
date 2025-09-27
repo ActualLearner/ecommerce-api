@@ -71,17 +71,31 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 20,  # You can choose any default number you like
 }
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Your Project API",
-    "DESCRIPTION": "Your project description",
+    # REQUIRED SETTINGS
+    "TITLE": "Project Nexus E-Commerce API",
+    "DESCRIPTION": (
+        "Welcome to the Project Nexus API documentation. This is a robust REST API "
+        "for an e-commerce platform, built as a final portfolio project for the "
+        "ALX Backend Engineering bootcamp. All write-access endpoints are restricted "
+        "to admin users."
+    ),
     "VERSION": "1.0.0",
-    "SERVE_INCLUDE_SCHEMA": False,  # We don't need the raw schema download button in the UI
-    # Optional: Customize the UI
+    # OPTIONAL BUT RECOMMENDED SETTINGS
+    "CONTACT": {
+        "name": "Abdellah Shafi",  # Replace with your name
+        "email": "abdellahshafi7@gmail.com",  # Replace with your email
+    },
+    "LICENSE": {
+        "name": "MIT License",
+        "url": "https://opensource.org/licenses/MIT",
+    },
+    # UI CUSTOMIZATION
+    "SERVE_INCLUDE_SCHEMA": False,
     "SWAGGER_UI_SETTINGS": {
         "deepLinking": True,
         "persistAuthorization": True,
         "displayOperationId": True,
     },
-    # OTHER SETTINGS
 }
 
 AUTH_USER_MODEL = "users.CustomUser"
