@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 import environ
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,7 +34,9 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
-
+RENDER_EXTERNAL_HOSTNAME = env.str("RENDER_EXTERNAL_HOSTNAME", default=None)
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # Application definition
 
@@ -56,6 +59,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -132,7 +136,14 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {"default": env.db()}
+DATABASES = {
+    "default": env.db(),
+}
+
+# Force SSL for Render PostgreSQL
+# The free tier database requires SSL but the connection string might not include it
+if "RENDER" in os.environ:
+    DATABASES["default"]["OPTIONS"] = {"sslmode": "require"}
 
 
 # Password validation
@@ -169,7 +180,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
+if not DEBUG:
+    STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

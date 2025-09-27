@@ -1,0 +1,29 @@
+databases:
+  # A PostgreSQL database service
+  - name: ecommerce-db
+    plan: free
+    region: frankfurt
+
+services:
+  # A web service running our Django application
+  - type: web
+    name: ecommerce-api
+    plan: free
+    runtime: docker
+    region: frankfurt
+    healthCheckPath: /api/v1/docs/
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ecommerce-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: false
+      - key: ALLOWED_HOSTS
+        fromService:
+          type: web
+          name: ecommerce-api
+          property: host
+    # The startCommand line has been completely removed.
