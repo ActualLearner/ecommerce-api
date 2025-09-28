@@ -136,6 +136,26 @@ class CartItemSerializer(serializers.ModelSerializer):
         fields = ["id", "product", "product_id", "quantity"]
         read_only_fields = ["id"]
 
+    def create(self, validated_data):
+        # Get the user's cart from the context passed by the view
+        cart = self.context["cart"]
+        product = validated_data.get("product")
+        quantity = validated_data.get("quantity")
+
+        # Use get_or_create to find or create a cart item
+        # This prevents the IntegrityError
+        cart_item, created = CartItem.objects.get_or_create(
+            cart=cart, product=product, defaults={"quantity": quantity}
+        )
+
+        # If the item was not created, it means it already existed.
+        # In this case, we update its quantity.
+        if not created:
+            cart_item.quantity += quantity
+            cart_item.save()
+
+        return cart_item
+
 
 class CartSerializer(serializers.ModelSerializer):
     """Serializer for the user's shopping cart."""

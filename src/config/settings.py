@@ -93,7 +93,7 @@ SPECTACULAR_SETTINGS = {
         "ALX Backend Engineering bootcamp. All write-access endpoints are restricted "
         "to admin users."
     ),
-    "VERSION": "1.0.0",
+    "VERSION": "1.1.0",
     # OPTIONAL BUT RECOMMENDED SETTINGS
     "CONTACT": {
         "name": "Abdellah Shafi",  # Replace with your name

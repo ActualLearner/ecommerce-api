@@ -167,6 +167,18 @@ class CartItemViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     http_method_names = ["get", "post", "patch", "delete"]  # Limit available methods
 
+    def get_serializer_context(self):
+        """
+        Passes the user's cart to the serializer as context.
+        This is needed for the serializer's custom create logic.
+        """
+        user = self.request.user
+        cart, _ = Cart.objects.get_or_create(user=user)
+        # Add the cart to the default context and return it
+        context = super().get_serializer_context()
+        context["cart"] = cart
+        return context
+
     def get_queryset(self):
         # Filter items to only those in the user's cart
         user = self.request.user

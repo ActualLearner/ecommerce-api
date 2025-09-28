@@ -1,0 +1,36 @@
+# Dockerfile for LOCAL DEVELOPMENT
+
+# Use the same base image as production for consistency
+FROM python:3.12-slim
+
+# Set environment variables for Python
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# set workdir
+WORKDIR /app
+
+# Install system dependencies needed for psycopg2 (PostgreSQL adapter)
+# This is the same as production
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  libpq-dev \
+  gcc \
+  && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+# We copy only the requirements file first to leverage Docker's layer caching
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# NOTE: We DO NOT copy the source code (`COPY ./src/ .`) here.
+# The compose.yaml file will mount the `src` directory as a volume,
+# which is what enables live-reloading.
+
+# NOTE: We also DO NOT run collectstatic or copy the entrypoint.sh script.
+# Those are production-only steps. The development server handles static files
+# and we will run it directly.
+
+# The default command to run when the container starts.
+# The command in compose.yaml will override this, but it's good practice
+# to have a sensible default.
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
