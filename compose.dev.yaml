@@ -5,7 +5,9 @@ services:
   web:
     build:
       # Override the Dockerfile to use the development version
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: Dockerfile
+      target: dev
     # Override the command to use the dev server
     command: python manage.py runserver 0.0.0.0:8000
     ports:
