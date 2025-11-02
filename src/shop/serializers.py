@@ -81,7 +81,7 @@ class CreateOrderSerializer(serializers.Serializer):
 
             # 2. Create the Order
             order = Order.objects.create(
-                user=user, total_price=total_price, status="success"
+                user=user, total_price=total_price, status="pending"
             )
 
             # 3. Create OrderItems from CartItems and check stock
