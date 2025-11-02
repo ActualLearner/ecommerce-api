@@ -1,0 +1,16 @@
+Registration (Frontend -> Backend):
+The frontend sends a POST request to POST /api/v1/auth/users/ (a new Djoser endpoint).
+The request body contains email, first_name, last_name, and password.
+Djoser's view creates a new CustomUser with is_active=False.
+The backend sends an activation email to the user's address. The link in the email will point to your frontend, e.g., https://alxpd.aymenab.com/activate/OQ/axb2-some-token/.
+The API returns a 201 Created response.
+Activation (User -> Frontend -> Backend):
+The user opens their email and clicks the activation link.
+They are taken to the /activate/... page on your React frontend.
+The React app extracts the {uid} and {token} from the URL.
+The frontend sends a POST request to POST /api/v1/auth/users/activation/ with the {uid} and {token} in the request body.
+Djoser's view validates the token and, if valid, sets the user's is_active field to True.
+The API returns a 204 No Content success response.
+Login (Frontend -> Backend):
+The user can now log in using POST /api/v1/auth/jwt/create/ with their email and password.
+Since their account is is_active=True, the login will succeed, and they will receive their JWTs.

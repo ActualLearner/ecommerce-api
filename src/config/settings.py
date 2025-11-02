@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
+    "djoser",
     "django_filters",
     "corsheaders",
     "drf_spectacular",
@@ -86,6 +87,15 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,  # You can choose any default number you like
 }
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=500),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("JWT",),
+}
+
 SPECTACULAR_SETTINGS = {
     # REQUIRED SETTINGS
     "TITLE": "Project Nexus E-Commerce API",
@@ -114,14 +124,34 @@ SPECTACULAR_SETTINGS = {
     },
 }
 
-AUTH_USER_MODEL = "users.CustomUser"
-
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=500),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    "ROTATE_REFRESH_TOKENS": True,
-    "BLACKLIST_AFTER_ROTATION": True,
+DJOSER = {
+    "ACTIVATION_URL": "activate/{uid}/{token}",
+    "PASSWORD_RESET_CONFIRM_URL": "password/reset/confirm/{uid}/{token}",
+    "SEND_ACTIVATION_EMAIL": True,
+    "USER_CREATE_PASSWORD_RETYPE": True,
+    # "SET_PASSWORD_RETYPE": True,
+    "PASSWORD_RESET_CONFIRM_RETYPE": True,
+    "TOKEN_MODEL": None,  # This tells Djoser to use JWTs
+    "SERIALIZERS": {
+        "user_create": "users.serializers.UserCreateSerializer",
+        "user": "users.serializers.UserSerializer",
+        "current_user": "users.serializers.UserSerializer",
+    },
+    "EMAIL": {
+        "activation": "djoser.email.ActivationEmail",
+    },
+    "PERMISSIONS": {
+        "user_create": ["rest_framework.permissions.AllowAny"],
+        "user_list": ["rest_framework.permissions.IsAdminUser"],
+    },
 }
+
+CHAPA_SECRET_KEY = env("CHAPA_SECRET_KEY")
+CHAPA_WEBHOOK_SECRET = env("CHAPA_WEBHOOK_SECRET")
+BACKEND_CALLBACK_URL = env("BACKEND_CALLBACK_URL")
+FRONTEND_RETURN_URL = env("FRONTEND_RETURN_URL")
+
+AUTH_USER_MODEL = "users.CustomUser"
 
 ROOT_URLCONF = "config.urls"
 
@@ -150,15 +180,17 @@ DATABASES = {
     "default": env.db(),
 }
 
+# --- EMAIL BACKEND CONFIGURATION ---
+# This line tells Django to print emails to the console instead of sending them.
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+SITE_NAME = "Project Nexus"
+
+
 # Force SSL for Render PostgreSQL
 # The free tier database requires SSL but the connection string might not include it
 if "RENDER" in os.environ:
     DATABASES["default"]["OPTIONS"] = {"sslmode": "require"}
-
-CHAPA_SECRET_KEY = env("CHAPA_SECRET_KEY")
-CHAPA_WEBHOOK_SECRET = env("CHAPA_WEBHOOK_SECRET")
-BACKEND_CALLBACK_URL = env("BACKEND_CALLBACK_URL")
-FRONTEND_RETURN_URL = env("FRONTEND_RETURN_URL")
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
