@@ -28,6 +28,7 @@ urlpatterns = [
     # API v1 App URLs
     path("api/v1/shop/", include("shop.urls")),
     path("api/v1/auth/", include("users.urls")),
+    path("api/v1/payments/", include("payment.urls")),
     # API Schema and Documentation URLs
     path("api/v1/schema/", SpectacularAPIView.as_view(), name="schema"),
     # Optional UI:
