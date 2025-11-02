@@ -53,9 +53,11 @@ INSTALLED_APPS = [
     "django_filters",
     "corsheaders",
     "drf_spectacular",
+    "django_extensions",
     # My Apps
     "users",
     "shop",
+    "payment",
 ]
 
 MIDDLEWARE = [
@@ -115,7 +117,7 @@ SPECTACULAR_SETTINGS = {
 AUTH_USER_MODEL = "users.CustomUser"
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=500),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
@@ -153,6 +155,10 @@ DATABASES = {
 if "RENDER" in os.environ:
     DATABASES["default"]["OPTIONS"] = {"sslmode": "require"}
 
+CHAPA_SECRET_KEY = env("CHAPA_SECRET_KEY")
+CHAPA_WEBHOOK_SECRET = env("CHAPA_WEBHOOK_SECRET")
+BACKEND_CALLBACK_URL = env("BACKEND_CALLBACK_URL")
+FRONTEND_RETURN_URL = env("FRONTEND_RETURN_URL")
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
