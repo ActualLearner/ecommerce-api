@@ -4,6 +4,20 @@
 # For more help, visit the .dockerignore file reference guide at
 # https://docs.docker.com/go/build-context-dockerignore/
 
+.env.example
+docs/
+.github/
+.git
+.gitignore
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+.venv/
+
 **/.DS_Store
 **/__pycache__
 **/.venv
@@ -23,6 +37,7 @@
 **/bin
 **/charts
 **/docker-compose*
+**/compose*
 **/compose.y*ml
 **/Dockerfile*
 **/node_modules
