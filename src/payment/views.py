@@ -139,10 +139,10 @@ class PaymentWebhookView(APIView):
     def post(self, request, *args, **kwargs):
         # 1. Verify the webhook signature for security
         signature = request.headers.get("chapa-signature")
-        xsignature = request.headers.get("x-chapa-signature")
+        x_signature = request.headers.get("x-chapa-signature")
         body = request.body
 
-        if not signature and not xsignature:
+        if not signature and not x_signature:
             return Response(
                 {"error": "Missing signature header."},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -150,11 +150,16 @@ class PaymentWebhookView(APIView):
 
         # Recompute the hash and compare
         secret = settings.CHAPA_WEBHOOK_SECRET.encode("utf-8")
+        x_computed_hash = hmac.new(secret, secret, hashlib.sha256).hexdigest()
         computed_hash = hmac.new(secret, body, hashlib.sha256).hexdigest()
 
-        if not hmac.compare_digest(
-            computed_hash, signature
-        ) and not hmac.compare_digest(computed_hash, xsignature):
+        valid = False
+        if signature and hmac.compare_digest(computed_hash, signature):
+            valid = True
+        elif x_signature and hmac.compare_digest(x_computed_hash, x_signature):
+            valid = True
+
+        if not valid:
             return Response(
                 {"error": "Invalid signature."}, status=status.HTTP_403_FORBIDDEN
             )
