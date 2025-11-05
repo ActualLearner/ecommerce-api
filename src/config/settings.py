@@ -93,7 +93,6 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
-    "AUTH_HEADER_TYPES": ("JWT",),
 }
 
 SPECTACULAR_SETTINGS = {
@@ -128,7 +127,6 @@ DJOSER = {
     "ACTIVATION_URL": "activate/{uid}/{token}",
     "PASSWORD_RESET_CONFIRM_URL": "password/reset/confirm/{uid}/{token}",
     "SEND_ACTIVATION_EMAIL": True,
-    "USER_CREATE_PASSWORD_RETYPE": True,
     # "SET_PASSWORD_RETYPE": True,
     "PASSWORD_RESET_CONFIRM_RETYPE": True,
     "TOKEN_MODEL": None,  # This tells Djoser to use JWTs
