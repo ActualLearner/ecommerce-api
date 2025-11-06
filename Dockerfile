@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.12-slim AS base
 
 # set workdir
 WORKDIR /app
@@ -15,6 +15,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy app source
 COPY ./src/ .
 
+FROM base AS dev
+
+EXPOSE 8000
+
+# Expose the port that the application listens on & run the application.
+EXPOSE 8000
+CMD ["python", "src/manage.py", "runserver", "0.0.0.0:8000"]
+
+FROM base AS prod
 # Copy the entrypoint script
 COPY entrypoint.sh .
 

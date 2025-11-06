@@ -13,6 +13,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from .serializers import (
     ProductListSerializer,
     ProductDetailSerializer,
+    ProductWriteSerializer,
     CategorySerializer,
     CartSerializer,
     CartItemSerializer,
@@ -48,6 +49,8 @@ class ProductViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return ProductListSerializer
+        elif self.action in ["create", "update", "partial_update"]:
+            return ProductWriteSerializer
 
         return ProductDetailSerializer
 

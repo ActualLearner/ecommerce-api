@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from datetime import timedelta
 from pathlib import Path
+import sys
 import environ
 import os
 
@@ -22,10 +23,8 @@ env = environ.Env(
     # set casting, default value
     DEBUG=(bool, False)
 )
-env.read_env(BASE_DIR.parent / ".env")
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+env.read_env(BASE_DIR.parent / ".env")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
@@ -50,12 +49,15 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
+    "djoser",
     "django_filters",
     "corsheaders",
     "drf_spectacular",
+    "django_extensions",
     # My Apps
     "users",
     "shop",
+    "payment",
 ]
 
 MIDDLEWARE = [
@@ -72,10 +74,6 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 
-# It is often a good idea to allow all origins for local development
-if DEBUG:
-    CORS_ALLOW_ALL_ORIGINS = True
-
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -84,6 +82,14 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,  # You can choose any default number you like
 }
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+}
+
 SPECTACULAR_SETTINGS = {
     # REQUIRED SETTINGS
     "TITLE": "Project Nexus E-Commerce API",
@@ -93,7 +99,7 @@ SPECTACULAR_SETTINGS = {
         "ALX Backend Engineering bootcamp. All write-access endpoints are restricted "
         "to admin users."
     ),
-    "VERSION": "1.1.0",
+    "VERSION": "2.0.0",
     # OPTIONAL BUT RECOMMENDED SETTINGS
     "CONTACT": {
         "name": "Abdellah Shafi",  # Replace with your name
@@ -112,14 +118,33 @@ SPECTACULAR_SETTINGS = {
     },
 }
 
-AUTH_USER_MODEL = "users.CustomUser"
-
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    "ROTATE_REFRESH_TOKENS": True,
-    "BLACKLIST_AFTER_ROTATION": True,
+DJOSER = {
+    "ACTIVATION_URL": "activate/{uid}/{token}",
+    "PASSWORD_RESET_CONFIRM_URL": "password/reset/confirm/{uid}/{token}",
+    "SEND_ACTIVATION_EMAIL": True,
+    # "SET_PASSWORD_RETYPE": True,
+    "PASSWORD_RESET_CONFIRM_RETYPE": True,
+    "TOKEN_MODEL": None,  # This tells Djoser to use JWTs
+    "SERIALIZERS": {
+        "user_create": "users.serializers.UserCreateSerializer",
+        "user": "users.serializers.UserSerializer",
+        "current_user": "users.serializers.UserSerializer",
+    },
+    "EMAIL": {
+        "activation": "djoser.email.ActivationEmail",
+    },
+    "PERMISSIONS": {
+        "user_create": ["rest_framework.permissions.AllowAny"],
+        "user_list": ["rest_framework.permissions.IsAdminUser"],
+    },
 }
+
+CHAPA_SECRET_KEY = env("CHAPA_SECRET_KEY")
+CHAPA_WEBHOOK_SECRET = env("CHAPA_WEBHOOK_SECRET")
+BACKEND_CALLBACK_URL = env("BACKEND_CALLBACK_URL")
+FRONTEND_RETURN_URL = env("FRONTEND_RETURN_URL")
+
+AUTH_USER_MODEL = "users.CustomUser"
 
 ROOT_URLCONF = "config.urls"
 
@@ -148,11 +173,33 @@ DATABASES = {
     "default": env.db(),
 }
 
+# --- EMAIL BACKEND CONFIGURATION ---
+# This line tells Django to print emails to the console instead of sending them.
+TESTING = "test" in sys.argv
+
+if TESTING:
+    # If running tests, ALWAYS use the console backend and a dummy 'from' address.
+    # This guarantees tests never send real emails and are 100% predictable.
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    DEFAULT_FROM_EMAIL = "testing@example.com"
+    # No need for SENDGRID_API_KEY in tests.
+else:
+    # For normal operation (runserver, gunicorn), read settings from the .env file.
+    # This allows production to use SendGrid while local dev uses the console.
+    EMAIL_BACKEND = env(
+        "EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend"
+    )
+    SENDGRID_API_KEY = env("SENDGRID_API_KEY", default=None)
+    DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="noreply@yourdomain.com")
+
+
+SITE_NAME = "Project Nexus"
+
+
 # Force SSL for Render PostgreSQL
 # The free tier database requires SSL but the connection string might not include it
 if "RENDER" in os.environ:
     DATABASES["default"]["OPTIONS"] = {"sslmode": "require"}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
