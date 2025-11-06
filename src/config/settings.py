@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from datetime import timedelta
 from pathlib import Path
+import sys
 import environ
 import os
 
@@ -175,7 +176,23 @@ DATABASES = {
 
 # --- EMAIL BACKEND CONFIGURATION ---
 # This line tells Django to print emails to the console instead of sending them.
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+TESTING = "test" in sys.argv
+
+if TESTING:
+    # If running tests, ALWAYS use the console backend and a dummy 'from' address.
+    # This guarantees tests never send real emails and are 100% predictable.
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    DEFAULT_FROM_EMAIL = "testing@example.com"
+    # No need for SENDGRID_API_KEY in tests.
+else:
+    # For normal operation (runserver, gunicorn), read settings from the .env file.
+    # This allows production to use SendGrid while local dev uses the console.
+    EMAIL_BACKEND = env(
+        "EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend"
+    )
+    SENDGRID_API_KEY = env("SENDGRID_API_KEY", default=None)
+    DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="noreply@yourdomain.com")
+
 
 SITE_NAME = "Project Nexus"
 
