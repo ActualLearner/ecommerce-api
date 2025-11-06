@@ -22,10 +22,8 @@ env = environ.Env(
     # set casting, default value
     DEBUG=(bool, False)
 )
-env.read_env(BASE_DIR.parent / ".env")
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+env.read_env(BASE_DIR.parent / ".env")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
@@ -75,10 +73,6 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 
-# It is often a good idea to allow all origins for local development
-if DEBUG:
-    CORS_ALLOW_ALL_ORIGINS = True
-
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -89,7 +83,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=500),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
@@ -104,7 +98,7 @@ SPECTACULAR_SETTINGS = {
         "ALX Backend Engineering bootcamp. All write-access endpoints are restricted "
         "to admin users."
     ),
-    "VERSION": "1.1.0",
+    "VERSION": "2.0.0",
     # OPTIONAL BUT RECOMMENDED SETTINGS
     "CONTACT": {
         "name": "Abdellah Shafi",  # Replace with your name
@@ -127,6 +121,7 @@ DJOSER = {
     "ACTIVATION_URL": "activate/{uid}/{token}",
     "PASSWORD_RESET_CONFIRM_URL": "password/reset/confirm/{uid}/{token}",
     "SEND_ACTIVATION_EMAIL": True,
+    "USER_CREATE_PASSWORD_RETYPE": True,
     # "SET_PASSWORD_RETYPE": True,
     "PASSWORD_RESET_CONFIRM_RETYPE": True,
     "TOKEN_MODEL": None,  # This tells Djoser to use JWTs
