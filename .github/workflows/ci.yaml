@@ -2,9 +2,18 @@ name: Dockerized Django CI
 
 on:
   push:
-    branches: [dev, features, release, hotfix]
+    branches:
+      - dev
+      - features/**
+      - release/**
+      - hotfix/**
   pull_request:
-    branches: [dev, features, release, hotfix, main]
+    branches:
+      - dev
+      - features/**
+      - release/**
+      - hotfix/**
+      - main
 
 
 jobs:
