@@ -1,6 +1,4 @@
-from django.shortcuts import render
 from rest_framework import viewsets, filters, status, generics
-from rest_framework.response import Response
 from rest_framework.permissions import (
     IsAdminUser,
     IsAuthenticatedOrReadOnly,
@@ -126,6 +124,14 @@ class OrderViewSet(viewsets.ModelViewSet):
             "order_items__product"
         )
 
+    @extend_schema(tags=["Order"])
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @extend_schema(tags=["Order"])
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
 
 @extend_schema_view(
     retrieve=extend_schema(description="Retrieve the current user's shopping cart."),
@@ -150,6 +156,10 @@ class CartViewSet(
     def get_queryset(self):
         # This ensures users can only see their own cart
         return Cart.objects.filter(user=self.request.user)
+
+    @extend_schema(tags=["Cart"])
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
 
 
 @extend_schema_view(
@@ -193,3 +203,11 @@ class CartItemViewSet(viewsets.ModelViewSet):
         # Associate the new cart item with the user's cart
         cart, _ = Cart.objects.get_or_create(user=self.request.user)
         serializer.save(cart=cart)
+
+    @extend_schema(tags=["Cart"])
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @extend_schema(tags=["Cart"])
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
