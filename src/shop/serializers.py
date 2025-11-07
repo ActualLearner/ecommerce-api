@@ -1,5 +1,7 @@
 from django.db import transaction
 from django.db.models import F
+from drf_spectacular.utils import extend_schema_field
+from decimal import Decimal
 from rest_framework import serializers
 from .models import Product, Category, Cart, CartItem, OrderItem, Order, Status
 from django.db import transaction
@@ -22,7 +24,7 @@ class ProductWriteSerializer(serializers.ModelSerializer):
     # so just including 'category' is enough to make it accept an ID.
     class Meta:
         model = Product
-        fields = ["name", "description", "price", "stock", "category"]
+        fields = ["name", "description", "price", "stock", "category", "image"]
 
 
 class ProductListSerializer(serializers.ModelSerializer):
@@ -31,7 +33,7 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ["id", "name", "price", "stock", "category"]
+        fields = ["id", "name", "price", "stock", "category", "image"]
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
@@ -41,7 +43,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         # The full list of fields
-        fields = ["id", "name", "description", "price", "stock", "category"]
+        fields = ["id", "name", "description", "price", "stock", "category", "image"]
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
@@ -218,6 +220,7 @@ class CartSerializer(serializers.ModelSerializer):
     """Serializer for the user's shopping cart."""
 
     cart_items = CartItemSerializer(many=True, read_only=True)
+
     total_price = serializers.SerializerMethodField()
 
     class Meta:
@@ -225,5 +228,10 @@ class CartSerializer(serializers.ModelSerializer):
         fields = ["id", "cart_items", "total_price"]
         read_only_fields = ["id", "cart_items", "total_price"]
 
+    @extend_schema_field(serializers.DecimalField(max_digits=10, decimal_places=2))
     def get_total_price(self, cart: Cart):
+
+        if not cart.cart_items.exists():
+            return Decimal("0.00")
+
         return sum(item.product.price * item.quantity for item in cart.cart_items.all())

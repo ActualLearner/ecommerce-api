@@ -52,6 +52,7 @@ class Product(models.Model):
     stock = models.PositiveIntegerField(
         default=0, help_text="The number of units available in stock."
     )
+    image = models.URLField(max_length=1024, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

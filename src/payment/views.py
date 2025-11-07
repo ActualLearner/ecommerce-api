@@ -8,6 +8,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from django.conf import settings
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -26,6 +27,36 @@ class InitializePaymentView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        summary="Initialize a Payment Transaction",
+        description="""
+        Creates a payment record in a 'pending' state and requests a checkout URL from the Chapa payment gateway.
+        The frontend should redirect the user to the returned 'checkout_url'.
+        """,
+        request=InitializePaymentSerializer,
+        responses={
+            200: OpenApiResponse(
+                description="Hosted Link",
+                examples=[
+                    {
+                        "name": "Success Response",
+                        "value": {
+                            "status": "success",
+                            "data": {
+                                "checkout_url": "https://checkout.chapa.co/checkout/payment/..."
+                            },
+                        },
+                    }
+                ],
+            ),
+            400: OpenApiResponse(
+                description="Bad Request (e.g., validation error, invalid order)"
+            ),
+            401: OpenApiResponse(description="Authentication required"),
+            404: OpenApiResponse(description="Order not found"),
+        },
+        tags=["Payment"],  # Group this endpoint under a 'Payment' tag in Swagger UI
+    )
     def post(self, request, *args, **kwargs):
 
         serializer = InitializePaymentSerializer(
@@ -135,6 +166,31 @@ class PaymentWebhookView(APIView):
 
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        summary="Chapa Payment Webhook",
+        description="""
+        Endpoint for Chapa to send asynchronous notifications about payment status.
+        This endpoint verifies the signature and updates the order status.
+        **This should only be called by Chapa's servers.**
+        """,
+        request={
+            "application/json": {
+                "type": "object",
+                "properties": {
+                    "tx_ref": {"type": "string"},
+                    "status": {"type": "string", "enum": ["success", "failed"]},
+                },
+            }
+        },
+        responses={
+            200: OpenApiResponse(description="Webhook received and acknowledged."),
+            400: OpenApiResponse(
+                description="Bad Request (e.g., missing signature, invalid JSON)"
+            ),
+            403: OpenApiResponse(description="Invalid signature."),
+        },
+        tags=["Payment"],
+    )
     def post(self, request, *args, **kwargs):
         # 1. Verify the webhook signature for security
         signature = request.headers.get("chapa-signature")

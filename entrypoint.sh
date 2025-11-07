@@ -7,6 +7,9 @@ set -o errexit
 echo "Applying database migrations..."
 python manage.py migrate
 
+# Seeding database
+python manage.py seed_db
+
 # Create the admin user (safe to run multiple times)
 echo "Creating admin user..."
 python manage.py createadmin
