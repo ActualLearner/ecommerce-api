@@ -32,7 +32,16 @@ RUN chmod +x /app/entrypoint.sh
 
 # Run collectstatic with dummy build-time secrets
 # These variables are only used during the build process and are not used in production
-RUN SECRET_KEY="dummy-key-for-build" DATABASE_URL="sqlite:////tmp/db.sqlite3" python manage.py collectstatic --no-input
+ENV SECRET_KEY="dummy-for-build"
+ENV DATABASE_URL="sqlite:///db.sqlite3"
+ENV CHAPA_SECRET_KEY="dummy"
+ENV CHAPA_WEBHOOK_SECRET="dummy"
+ENV BACKEND_CALLBACK_URL="dummy"
+ENV FRONTEND_RETURN_URL="dummy"
+ENV SENDGRID_API_KEY="dummy"
+ENV DEFAULT_FROM_EMAIL="dummy@example.com"
+
+RUN python manage.py collectstatic --no-input
 
 EXPOSE 10000
 
