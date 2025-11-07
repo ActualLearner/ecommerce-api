@@ -9,7 +9,7 @@ The API provides a complete backend solution for managing products, categories, 
 **Live Demo:**
 
 - **Connected Frontend:** [**https://alxpd.aymenab.com/**](https://alxpd.aymenab.com/)
-- **Backend API Docs (Swagger UI):** [**https://ecommerce-api-glia.onrender.com/api/v1/docs/**](https://ecommerce-api-glia.onrender.com/api/v1/docs/)
+- **Backend API Docs (Swagger UI):** [**https://ecommerce-api-wzfo.onrender.com/api/v1/docs/**](https://ecommerce-api-wzfo.onrender.com/api/v1/docs/)
 
 ## Table of Contents
 
@@ -51,7 +51,7 @@ The API provides a complete backend solution for managing products, categories, 
 
 The API is fully documented using OpenAPI 3.0 and is live on Render.
 
-- **Live Swagger Docs**: [**https://ecommerce-api-glia.onrender.com/api/v1/docs/**](https://ecommerce-api-glia.onrender.com/api/v1/docs/)
+- **Live Swagger Docs**: [**https://ecommerce-api-wzfo.onrender.com/api/v1/docs/**](https://ecommerce-api-wzfo.onrender.com/api/v1/docs/)
 
 For local development, the interactive UI can be accessed at:
 
