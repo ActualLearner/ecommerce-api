@@ -1,8 +1,8 @@
 databases:
   # A PostgreSQL database service
-  - name: ecommerce-db
+  - name: Render_db
     plan: free
-    region: frankfurt
+    region: Oregon
 
 services:
   # A web service running our Django application
