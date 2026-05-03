@@ -2,7 +2,7 @@ databases:
   # A PostgreSQL database service
   - name: Render_db
     plan: free
-    region: Oregon
+    region: oregon
 
 services:
   # A web service running our Django application
@@ -10,12 +10,12 @@ services:
     name: ecommerce-api
     plan: free
     runtime: docker
-    region: frankfurt
+    region: oregon
     healthCheckPath: /api/v1/docs/
     envVars:
       - key: DATABASE_URL
         fromDatabase:
-          name: ecommerce-db
+          name: Render_db
           property: connectionString
       - key: SECRET_KEY
         generateValue: true
